@@ -255,3 +255,58 @@ npm run dev
 ## License
 
 [GPL](https://github.com/bailicangdu/node-elm/blob/master/COPYING)
+
+## 导入数据库
+mongorestore -h 127.0.0.1 -d elm --dir /Users/houzi/Documents/elm
+
+mongorestore -h connection -d dbname --dir filepath
+参数说明：
+
+-h: 连接IP和端口号（默认127.0.0.1:27017）
+-d: 数据库名
+--dir: 备份的数据库的路径
+4.2. 实例：
+mongorestore -h 127.0.0.1 -d wcx2020 --dir D:\mongodbBackup
+4.3. 注意事项：
+恢复的时候可以加--drop 覆盖原来的数据库（慎用），最好提前备份好当前数据库；同时要更改数据库名，不然恢复会失败。
+
+
+##mongo启动
+
+安装
+brew tap mongodb/brew
+brew install mongodb-community@4.4
+
+启动
+brew services start mongodb-community@4.4
+
+停止
+brew services stop
+brew services stop mongodb-community@4.4
+sudo brew services start mongodb-community@4.4
+
+
+后台启动
+mongod --config /usr/local/etc/mongod.conf --fork
+
+brew services start mongodb-community
+
+mongdb数据库
+/Users/houzi/mongodb/data
+
+原来数据库
+/Users/houzi/data/db
+
+##
+mongod --config /usr/local/etc/mongod.conf --fork
+
+
+## mongo 正常退出
+
+
+    use admin
+    db.shutdownServer()
+
+## 账号 
+mason9999
+zxc6545398

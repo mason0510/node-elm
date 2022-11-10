@@ -16,16 +16,29 @@ class User extends AddressComponent {
 		this.updateAvatar = this.updateAvatar.bind(this);
 	}
 	async login(req, res, next){
-		const cap = req.cookies.cap;
-		if (!cap) {
-			console.log('验证码失效')
-			res.send({
-				status: 0,
-				type: 'ERROR_CAPTCHA',
-				message: '验证码失效',
-			})
-			return
-		}
+		//console.log("req=======",req.);
+		console.log("req.body===============",req.params);
+		console.log(req.params.username);
+		console.log(req.params.pass);
+		//打印req
+		console.log("req",req.get('Content-Type'));
+		//获取参数
+		const {body} = req.body;
+		console.log("body",body);
+		// if (!cap) {
+		// 	console.log('验证码失效')
+		// 	res.send({
+		// 		status: 0,
+		// 		type: 'ERROR_CAPTCHA',
+		// 		message: '验证码失效',
+		// 	})
+		// 	return
+		// }
+		//格式化请求参数 req
+		// 取出req.body中的username和password
+		const {username, password, captcha_code} = req.body;
+		//打印
+		//console.log(username, password, captcha_code);
 		const form = new formidable.IncomingForm();
 		form.parse(req, async (err, fields, files) => {
 			const {username, password, captcha_code} = fields;
@@ -55,6 +68,9 @@ class User extends AddressComponent {
 				return
 			}
 			const newpassword = this.encryption(password);
+			//解密密码
+			const mypassword = this.encryption(password);
+			console.log('mypassword', mypassword)
 			try{
 				const user = await UserModel.findOne({username});
 				//创建一个新的用户
@@ -64,6 +80,8 @@ class User extends AddressComponent {
 					const registe_time = dtime().format('YYYY-MM-DD HH:mm');
 					const newUser = {username, password: newpassword, user_id};
 					const newUserInfo = {username, user_id, id: user_id, city: cityInfo.city, registe_time, };
+					//打印newUser
+					console.log('newUser', newUser)
 					UserModel.create(newUser);
 					const createUser = new UserInfoModel(newUserInfo);
 					const userinfo = await createUser.save();
@@ -76,11 +94,11 @@ class User extends AddressComponent {
 						type: 'ERROR_PASSWORD',
 						message: '密码错误',
 					})
-					return 
+					return
 				}else{
 					req.session.user_id = user.user_id;
 					const userinfo = await UserInfoModel.findOne({user_id: user.user_id}, '-_id');
-					res.send(userinfo) 
+					res.send(userinfo)
 				}
 			}catch(err){
 				console.log('用户登陆失败', err);
@@ -103,11 +121,11 @@ class User extends AddressComponent {
 				type: 'GET_USER_INFO_FAIELD',
 				message: '通过session获取用户信息失败',
 			})
-			return 
+			return
 		}
 		try{
 			const userinfo = await UserInfoModel.findOne({user_id}, '-_id');
-			res.send(userinfo) 
+			res.send(userinfo)
 		}catch(err){
 			console.log('通过session获取用户信息失败', err);
 			res.send({
@@ -126,11 +144,11 @@ class User extends AddressComponent {
 				type: 'GET_USER_INFO_FAIELD',
 				message: '通过用户ID获取用户信息失败',
 			})
-			return 
+			return
 		}
 		try{
 			const userinfo = await UserInfoModel.findOne({user_id}, '-_id');
-			res.send(userinfo) 
+			res.send(userinfo)
 		}catch(err){
 			console.log('通过用户ID获取用户信息失败', err);
 			res.send({
@@ -274,7 +292,7 @@ class User extends AddressComponent {
 				type: 'ERROR_USERID',
 				message: 'user_id参数错误',
 			})
-			return 
+			return
 		}
 
 		try{
@@ -320,6 +338,6 @@ class User extends AddressComponent {
 			})
 		})
 	}
-} 
+}
 
 export default new User()
