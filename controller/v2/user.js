@@ -16,32 +16,21 @@ class User extends AddressComponent {
 		this.updateAvatar = this.updateAvatar.bind(this);
 	}
 	async login(req, res, next){
-		//console.log("req=======",req.);
-		console.log("req.body===============",req.params);
-		console.log(req.params.username);
-		console.log(req.params.pass);
-		//打印req
-		console.log("req",req.get('Content-Type'));
-		//获取参数
-		const {body} = req.body;
-		console.log("body",body);
-		// if (!cap) {
-		// 	console.log('验证码失效')
-		// 	res.send({
-		// 		status: 0,
-		// 		type: 'ERROR_CAPTCHA',
-		// 		message: '验证码失效',
-		// 	})
-		// 	return
-		// }
-		//格式化请求参数 req
-		// 取出req.body中的username和password
-		const {username, password, captcha_code} = req.body;
-		//打印
-		//console.log(username, password, captcha_code);
+		const cap = req.cookies.cap;
+		if (!cap) {
+			console.log('验证码失效')
+			res.send({
+				status: 0,
+				type: 'ERROR_CAPTCHA',
+				message: '验证码失效',
+			})
+			return
+		}
 		const form = new formidable.IncomingForm();
 		form.parse(req, async (err, fields, files) => {
 			const {username, password, captcha_code} = fields;
+			//打印出来的是一个对象
+			console.log(fields)
 			try{
 				if (!username) {
 					throw new Error('用户名参数错误');
@@ -68,9 +57,6 @@ class User extends AddressComponent {
 				return
 			}
 			const newpassword = this.encryption(password);
-			//解密密码
-			const mypassword = this.encryption(password);
-			console.log('mypassword', mypassword)
 			try{
 				const user = await UserModel.findOne({username});
 				//创建一个新的用户
@@ -80,8 +66,6 @@ class User extends AddressComponent {
 					const registe_time = dtime().format('YYYY-MM-DD HH:mm');
 					const newUser = {username, password: newpassword, user_id};
 					const newUserInfo = {username, user_id, id: user_id, city: cityInfo.city, registe_time, };
-					//打印newUser
-					console.log('newUser', newUser)
 					UserModel.create(newUser);
 					const createUser = new UserInfoModel(newUserInfo);
 					const userinfo = await createUser.save();
